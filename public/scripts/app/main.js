@@ -11,13 +11,8 @@
         this.isMiddle = true;
     };
 
-    var initialTriangle = new triangle(
-        { x: 350, y: 0 },
-        { x: 100, y: 500 },
-        { x: 600, y: 500 },
-        { isMiddle: false }
-    ),
-        defaultTriangles = [
+    var initialTriangle = calculateInitialTriangleStartPoint();
+     var   defaultTriangles = [
             initialTriangle
         ],
         allTriangles = [];
@@ -70,6 +65,30 @@
         var sin60 = Math.sqrt(3) / 2;
         var screenHeight = window.innerHeight;
         var screenWidth = window.innerWidth;
+        var width, height;
+
+        if (sin60 * screenWidth < screenHeight) {
+            // Triangle takes up entire width    
+            width = screenWidth;
+            height = sin60 * screenWidth;
+            x = 0;
+            y = screenHeight - height;
+        } else {
+            // Triangle takes up entire height
+            width = screenHeight / sin60;
+            height = screenHeight;
+            x = (screenWidth - width) / 2;
+            y = 0;           
+        }
+
+        p1x = x + (width >> 1);
+        p1y = y;
+        p2y = y + height;
+        p3y = y + height;
+        p2x = x;  
+        p3x = x + width;
+
+        return new triangle({x : p1x, y: p1y}, {x : p2x, y: p2y}, {x : p3x, y: p3y});
     };
 
     function createTriangles(triangles) {
@@ -102,8 +121,8 @@
 	}
 
     var canvas = document.getElementById('myCanvas');
-    canvas.width = 800;
-    canvas.height = 800;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     context = canvas.getContext("2d");
     var count = 8;
 
