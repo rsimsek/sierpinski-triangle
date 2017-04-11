@@ -109,9 +109,9 @@
 
     document.getElementById('increment').onclick = function () {
         count = count + 1;
-        context.scale(3,1);
         allTriangles = [];
-        console.log('iteration :' + count);
+        //console.log('iteration :' + count);
+        createTriangles(defaultTriangles);
         iterator(count);
     };
 
