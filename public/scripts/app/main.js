@@ -5,14 +5,13 @@
         this.p3 = p3;
     };
 
-
     var middleTriangle = function (p1, p2, p3) {
         triangle.call(this, p1, p2, p3);
         this.isMiddle = true;
     };
 
     var initialTriangle = calculateInitialTriangleStartPoint();
-     var   defaultTriangles = [
+    var   defaultTriangles = [
             initialTriangle
         ],
         allTriangles = [];
@@ -81,7 +80,7 @@
             y = 0;           
         }
 
-        p1x = x + (width >> 1);
+        p1x = x + (width / 2);
         p1y = y;
         p2y = y + height;
         p3y = y + height;
@@ -127,6 +126,9 @@
     var count = 8;
 
     document.getElementById('increment').onclick = function () {
+        if (count === 9) {
+           count = 4; 
+        }
         count = count + 1;
         allTriangles = [];
         //console.log('iteration :' + count);
@@ -135,12 +137,58 @@
     };
 
     document.getElementById('decrement').onclick = function () {
-        count = count - 1;
+        if (count > -1) {
+            count = count - 1;
+        }
+        count = count;
         allTriangles = [];
   		createTriangles(defaultTriangles);
   		iterator(count);
     };
 
+    var zoomIntensity = 0.2;
+    var scale = 1;
+    var originx = 0;
+    var originy = 0;
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+    var visibleWidth = width;
+    var visibleHeight = height;
+
+canvas.onmousewheel = function (event){
+    event.preventDefault();
+    // Get mouse offset.
+    var mousex = event.clientX - canvas.offsetLeft;
+    var mousey = event.clientY - canvas.offsetTop;
+    // Normalize wheel to +1 or -1.
+    var wheel = event.wheelDelta/120;
+
+    // Compute zoom factor.
+    var zoom = Math.exp(wheel*zoomIntensity);
+    
+    // Translate so the visible origin is at the context's origin.
+    context.translate(originx, originy);
+  
+    // Compute the new visible origin. Originally the mouse is at a
+    // distance mouse/scale from the corner, we want the point under
+    // the mouse to remain in the same place after the zoom, but this
+    // is at mouse/new_scale away from the corner. Therefore we need to
+    // shift the origin (coordinates of the corner) to account for this.
+    originx -= mousex/(scale*zoom) - mousex/scale;
+    originy -= mousey/(scale*zoom) - mousey/scale;
+    
+    // Scale it (centered around the origin due to the trasnslate above).
+    context.scale(zoom, zoom);
+    // Offset the visible origin to it's proper position.
+    context.translate(-originx, -originy);
+
+    // Update scale and others.
+    scale *= zoom;
+    visibleWidth = width / scale;
+    visibleHeight = height / scale;
+    calculateInitialTriangleStartPoint();
+    iterator(2);
+}
 
     // document.getElementById("myCanvas").addEventListener("wheel", myFunction);
     // 	function myFunction(initialTriangle) {
